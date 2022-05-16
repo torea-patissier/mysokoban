@@ -10,10 +10,12 @@ class Game:
     def __init__(self):
         self.snake = Snake()
         self.food = Food()
+        self.generate_food()
 
     def update(self):
         self.snake.move_snake()
         self.check_head_on_food()
+        self.game_over()  
 
     def draw_game_element(self):
         self.food.draw_food()
@@ -29,8 +31,31 @@ class Game:
         else:
             self.snake.body.pop(0)
 
-    def generate_food(self):
-        self.food = Food()           
+    def generate_food(self): #Gère si la nourriture pop sur la pos du snake
+        should_generate_food = True
+        while should_generate_food:
+            count = 0
+            for block in self.snake.body:
+                if block.x == self.food.block.x and block.y == self.food.block.y:
+                    count += 1
+            if count == 0:
+                should_generate_food = False  
+            else:
+                self.food = Food()  
+
+    def game_over(self):
+        snake_length = len(self.snake.body)
+        snake_head = self.snake.body[snake_length - 1]
+        #Si je sors de la surface GAME OVER
+        if ((snake_head.x not in range(0, NB_COL)) or (snake_head.y not in range(0, NB_ROW))):
+            self.snake.reset_snake()
+            print('GAME OVER')
+             
+        # Si collision du snake sur lui même également GAME OVER
+        for block in self.snake.body[0:snake_length - 1]:
+            if block.x == snake_head.x and block.y == snake_head.y:
+                print('GAME OVER AUSSI')
+                self.snake.reset_snake()
 
 #Classe pour détecter la position d'un élément sur le screen
 class Block:
@@ -89,6 +114,9 @@ class Snake:
 
         self.body.append(new_head)
 
+    def reset_snake(self):
+        self.body= [Block(2,6),Block(3,6),Block(4,6)]
+        self.direction = 'RIGHT' # Au début du jeux le snake se déplace vers la droite 
 #Config
 screen = pygame.display.set_mode(size=(NB_COL * CELL_SIZE, NB_ROW * CELL_SIZE)) #Display Surface
 timer = pygame.time.Clock() #FPS
