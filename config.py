@@ -8,3 +8,4 @@ FPS = 60
 
 #Couleurs
 FOOD_COLOR = (255,0,0)
+WHITE  = (4,4,4)
