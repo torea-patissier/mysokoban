@@ -5,7 +5,7 @@ from config import *
 
 pygame.init()
 
-
+#Permet d'update le snake et la nourriture
 class Game:
     def __init__(self):
         self.snake = Snake()
@@ -13,10 +13,24 @@ class Game:
 
     def update(self):
         self.snake.move_snake()
+        self.check_head_on_food()
 
     def draw_game_element(self):
         self.food.draw_food()
         self.snake.draw_snake()
+
+    def check_head_on_food(self):
+        snake_length = len(self.snake.body)
+        snake_head_block = self.snake.body[snake_length - 1]
+        food_block = self.food.block
+        #Si collision avec nourriture alors +1, sinon rien ne se passe 
+        if snake_head_block.x == food_block.x and snake_head_block.y == food_block.y:
+            self.generate_food()
+        else:
+            self.snake.body.pop(0)
+
+    def generate_food(self):
+        self.food = Food()           
 
 #Classe pour détecter la position d'un élément sur le screen
 class Block:
@@ -56,6 +70,7 @@ class Snake:
             block_rect = pygame.Rect(x_coord,y_coord,CELL_SIZE,CELL_SIZE) #Definie x, y, w, h
             pygame.draw.rect(screen,pygame.Color('blue'),block_rect) #Dessine sur le DS
     
+
     def move_snake(self):
         snake_block_count = len(self.body)
         old_head = self.body[snake_block_count - 1]
@@ -73,7 +88,8 @@ class Snake:
             new_head = Block(old_head.x, old_head.y + 1)
 
         self.body.append(new_head)
-        self.body.pop(0)
+
+#Config
 screen = pygame.display.set_mode(size=(NB_COL * CELL_SIZE, NB_ROW * CELL_SIZE)) #Display Surface
 timer = pygame.time.Clock() #FPS
 game_on = True
